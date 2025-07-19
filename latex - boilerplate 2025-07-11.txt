@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[T1]{tipa}
+\usepackage{multicol}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+\begin{document}
+\begin{multicols}{3}
+
+
+
+
+\end{multicols}
+\end{document}
+
+
