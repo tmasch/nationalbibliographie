@@ -3,41 +3,6 @@ Das ist eine Konfigurationsdatei für die Exzerpte aus der Nationalbibliographie
 """
 
 
-def umlaut_nach_unicode(text):
-    """
-    Im Exportformat der GND wrden Buchstaben mit Umlauten oder Akzenten 
-    als Kombination des Grundbuchstaben und eines Akzents oder Tremas 
-    Sie werden hier durch die korrekten Unicode-Zeichen ersetzt. 
-    Das wurde vor allem eingerichtet, weil LaTeX, das ich zuerst verwendete,
-    bei der Verwendung nicht-vorgesehener Zeichen abstürzte
-        """
-    encoding_list = {"Ä" : "Ä", "Ö": "Ö", "Ü": "Ü", \
-                     "ä": "ä", "á" : "á", "ă" : "ă", "ǎ" : "ă", "â" : "â", "å" : "å", "ā" : "ā", "å" : "å", "à" : "à", "ã" : "ã", "ẩ" : "ẩ", "Ā" : "Ā", "Á" : "Á", "À" : "À", "ą" : "ą", "ӑ" : "ă",\
-                     "ç" : "ç", "č" : "č", "ć" : "ć", "Č" : "Č", "cʹ" : "ć", \
-                     "Đ" : "Đ", "dʹ" : "ď", \
-                     "É" : "É", "é": "é", "ě" : "ě" , "ē" : "ē", "ë" : "ë", "è" : "è", "ę" : "ę", "ǝ" : "\textschwa", "ǝ̀" : "ə\textschwa", "ė" : "ė", "ê" : "ê", "Ė" : "Ë", "È" : "È",\
-                     "ǧ" : "ǧ", "ğ" : "ğ", "ģ" : "ģ", "ġ" : "ġ",  \
-                     "ḥ": "ḥ", "ḫ" : "\textsubwedge{h}", "ḫ" : "\textsubwedge{h}", "Ḫ" : "\textsubwedge{H}", "ʰ" : "^h", \
-                     "í" : "í", "ï" : "ï", "ī" : "ī",  "ì" : "ì", "Í" : "Í", "î" : "î", "ĺ" : "í", \
-                     "ḳ" : r"\textsubdot{k}", \
-                     "ł" : "ł", "lʹ" : "ľ", \
-                     "ñ" : "ñ", "ń" : "ń", \
-                    "ö": "ö", "ö" : "ö", "ó" : "ó", "ō" : "ō", "ò" : "ò", "õ" : "õ", "o͏̈" : "ő", "Ó" : "Ó", "ő" : "ő", \
-                    "ř" : "ř", "ṛ" : "ṛ", "Ř" : "Ř", \
-                     "Š" : "Š", "š" : "š", "ș" : "ş", "ş" : "ş", "Ś" : "Ś", "ṣ" : "ṣ", "š" : "š", "Š" : "Š", "sʹ" : "s'", "ś" : "ś",\
-                     "ṭ" : u"\u1E6D", "ţ" : "\textsubdot{T}", "tʹ" : "ť", "ṯ" : "ṯ", "t̕’" : "ť", "Ṭ" : "\textsubdot{T}", "ṯ" : "ṯ", "t̕" : "ť", "Ţ" : "Ţ","ᵗ" : "^t", \
-                    "ü": "ü", "ū" : "ū", "ù" : "ù", "ú" : "ú", "ů" : "ů", "ų" : "ų", "ữ" : "ṹ", "ứ" : "ứ", "ŭ" : "ù", "ǔ" : "ù", \
-                    "ý" : "ý", \
-                    "ž" : "ž", "ż" : "ż", "z̆" : "ž", "ź" : "ź", \
-                    "Δ" : "\Delta", 
-                    "⁹" : "^9",
-                    "&" : r"\&", "#" : r"\#", "%" : "\%", "♥" :"", "ʿ" : "'", u'u200E' : "", u'u2009' : " ", u'\u0098' : '', u'\u009C' : '', u'\034F' : ""}
-    for old, new in encoding_list.items():
-        text = text.replace(old, new)
-
-    return text
-
-
 def sachgruppenliste():
     """
     Diese Funktion gibt ein Dictionary der in der Nationalbibliographie verwendeten DDCs zurück. 
