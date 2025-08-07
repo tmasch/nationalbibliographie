@@ -38,6 +38,7 @@ def main():
     Modul called for starting programme
     """
     bibliographie_liste = []
+    normdaten_liste = []
     bibliographie_nummer = input("Bitte Jahr, Reihe und Monat eingeben, z.B. 25A07: ")
     eintragsliste = lade_datensaetze_herunter(bibliographie_nummer)
     counter = 0
@@ -48,6 +49,17 @@ def main():
                 #print(counter)
                 katalogisat = stelle_katalogisat_zusammen(eintrag)
                 bibliographie_liste.append(katalogisat)
+                for normdaten_neu in katalogisat.normdaten_liste:
+                    print("normdaten im Katalogisat")
+                    print(normdaten_neu)
+                    for normdaten_bestand in normdaten_liste:
+                        if normdaten_neu.id == normdaten_bestand.id:
+                            break
+                    else:
+                        normdaten_liste.append(normdaten_neu)
+
+    print(normdaten_liste)
+    
     #txt_datei_erzeugen_alt(bibliographie_liste)
     pdf_erzeugen(bibliographie_nummer, bibliographie_liste)
 
@@ -140,17 +152,22 @@ def lade_datensaetze_herunter(bibliographie):
 def stelle_katalogisat_zusammen(eintrag):
     katalogisat = Katalogisat()
     katalogisat.ddc_zum_sortieren = ""
+    erster_geistiger_schoepfer_relevant = False
     ddc = lade_ddc(eintrag)
     if ddc:
         #print("DDC aus der Datenbank")
         #print(ddc)
-        katalogisat.ddc_zum_sortieren = ddc
+        katalogisat.ddc_zum_sortieren = ddc      
+        for ddc_einzeln in ddc:
+            if ddc_einzeln in nationalbibliographie_config.zeige_sachgruppen_mit_relevantem_ersten_geisten_schoepfer():
+                erster_geistiger_schoepfer_relevant = True
+                # Für Kunst und Belletristik wird die regionale Herkunft des Ersten Geistigen Schöpfers ausgewertet.
 
     bibliographische_angaben = ""
     erster_geistiger_schoepfer_name, erster_geistiger_schoepfer_id = lade_ersten_geistigen_schoepfer(eintrag)
     if erster_geistiger_schoepfer_name:
         katalogisat.bibliographische_angaben_fett = erster_geistiger_schoepfer_name + ": "
-    if erster_geistiger_schoepfer_id: # muss noch auf bestimmte DDC-Klassen beschränkt werden
+    if erster_geistiger_schoepfer_id and erster_geistiger_schoepfer_relevant:
         normdaten = Normdaten(name=erster_geistiger_schoepfer_name, id=erster_geistiger_schoepfer_id)
         katalogisat.normdaten_liste.append(normdaten)
     titelangabe = lade_titel(eintrag)
@@ -177,7 +194,9 @@ def stelle_katalogisat_zusammen(eintrag):
     if isbn_liste:
         for isbn in isbn_liste:
             bibliographische_angaben = bibliographische_angaben + isbn
-    katalogisat.schlagwortliste = lade_schlagwortliste(eintrag)
+    katalogisat.schlagwortliste, schlagwort_normdaten = lade_schlagwortliste(eintrag)
+    for normdaten_neu in schlagwort_normdaten:
+        katalogisat.normdaten_liste.append(normdaten_neu)
 
     #print("x")
     #print(bibliographische_angaben)
@@ -447,15 +466,49 @@ def lade_isbn(eintrag):
     return isbn_liste
 
 def lade_schlagwortliste(eintrag):
+    """
+    Erzeugt aus den Schlagwörtern in Feld 689 nach Ketten getrennte 
+    Schlagwortlisten. 
+    """
     schlagwortliste = [[]]
+    normdaten_liste = []
     datafields = find_datafields(eintrag, "689")
     for datafield in datafields:
         subfields = find_subfields_with_ind(datafield, "a")
         if subfields:
-            schlagwort_tupel = subfields[0]
+            schlagwort = subfields[0][0]
+            ind1 = subfields[0][1]
+            ind2 = subfields[0][2]
 #            print("Schlagwort gefunden")
 #            print(schlagwort_tupel)
+            subfields = find_subfields(datafield, "c")
+            if subfields:
+                schlagwort = schlagwort + ", " + subfields[0]
+            subfields = find_subfields(datafield, "d")
+            if subfields:
+                schlagwort = schlagwort + " (" + subfields[0] + ")"
+            subfields = find_subfields(datafield, "t")
+            if subfields:
+                schlagwort = schlagwort + ": " + subfields[0]
+            schlagwort_tupel = (schlagwort, ind1, ind2)
+            
             schlagwortliste.append(schlagwort_tupel)
+        subfields = find_subfields(datafield, "D")
+        if subfields:
+            schlagworttyp = subfields[0]
+            if schlagworttyp in ["p", "g"]:
+                subfields = find_subfields(datafield, "0")
+                if subfields: 
+                    schlagwort_id = subfields[0]
+                    if schlagwort_id[0:8] in ["(DE-101)", "(DE-588)"]:
+                        schlagwort_id = schlagwort_id[9:]
+                    schlagwort_normdaten = Normdaten(name =schlagwort, id = schlagwort_id)
+                    normdaten_liste.append(schlagwort_normdaten)
+                    
+                    
+
+
+
     schlagwortanzeige = ""
     for i in range(0, len(schlagwortliste)+1): 
         if schlagwortanzeige != "" and schlagwortanzeige[-4:] != " || ":
@@ -472,7 +525,9 @@ def lade_schlagwortliste(eintrag):
     schlagwortanzeige = schlagwortanzeige.replace("||  ; ", "|| ")
     #if schlagwortanzeige != "":
         #print(schlagwortanzeige)
-    return schlagwortanzeige
+#        print(normdaten_liste)
+    return schlagwortanzeige, normdaten_liste
+
 
 
 def pdf_erzeugen(bibliographie_nummer, bibliographie_liste):

@@ -30,7 +30,7 @@ def sachgruppenliste():
                   "320" : ("320 Politik", True), \
                   "330" : ("330 Wirtschaft", True), \
                   "333.7" : ("333.7 Natürliche Ressourcen, Energie und Umwelt", True), \
-                  "340" : ("340 Reht", True), \
+                  "340" : ("340 Recht", True), \
                   "350" : ("350 Öffentliche Verwaltung", True), \
                   "355" : ("355 Militär", True), \
                   "360" : ("360 Soziale Probleme, Sozialdienste, Versicherungen", True), \
@@ -112,3 +112,15 @@ def sachgruppenliste():
                   "K" : ("K Kinder- und Jugendliteratur", True), \
                   "S" : ("S Schulbücher", True)}
     return sachgruppenliste
+
+def zeige_sachgruppen_mit_relevantem_ersten_geisten_schoepfer():
+    """
+    Diese Funktion gibt eine Liste von DDCs aus, bei denen die Herkunft
+    des Ersten Geistigen Schöpfers für Regionalbibliotheken relevant ist. 
+    Das betrifft vor allem Belletristik und Kunst.     
+    
+    """
+    sachgruppen_mit_relevantem_ersten_geistigen_schoepfer = \
+        ["700", "710", "720", "730", "740", "741.5", "750", "760", "770", "800", \
+         "810", "820", "830", "840", "850", "860", "870", "880", "i890", "891.8", "B"]
+    return sachgruppen_mit_relevantem_ersten_geistigen_schoepfer
